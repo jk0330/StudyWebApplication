@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace StudyWebApplication.DbContext
 {
-    public class ParameterMember : List<OracleParameter>
+    public class ParameterMember : List<Parameter>
     {
         public void Add(OracleDbType dbType, string parameterName , object value)
         {
-            this.Add(new OracleParameter(dbType, parameterName, value));
+            this.Add(new Parameter(dbType, parameterName, value));
         }
     }
 }

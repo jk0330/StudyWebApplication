@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace StudyWebApplication.ViewModel
+namespace StudyWebApplication.ViewModels
 {
-    public class DtoUser
+    public class UserViewModel
     {
         [Required(ErrorMessage = "사용자 ID을 입력하세요.")]
         public string UserId { get; set; }

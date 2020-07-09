@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace StudyWebApplication.DbContext
 {
-    public class OracleParameter
+    public class Parameter
     {
         public OracleDbType DbType { get; set; }
 
@@ -16,7 +16,7 @@ namespace StudyWebApplication.DbContext
 
         public object Value { get; set; }
 
-        public OracleParameter(OracleDbType dbType, string parameterName, object value)
+        public Parameter(OracleDbType dbType, string parameterName, object value)
         {
             ParameterName = parameterName;
             DbType = dbType;

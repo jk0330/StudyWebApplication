@@ -2,55 +2,152 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Oracle.ManagedDataAccess.Client;
+using OracleInternal.SqlAndPlsqlParser.LocalParsing;
 
 namespace StudyWebApplication.DbContext
 {
     public class OracleDataContext
     {
-        private static OracleConnection Conn { get; set; } = new OracleConnection("Data Source = (DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.26)(PORT = MyPort))(CONNECT_DATA = (SERVICE_NAME = ORCL))); User Id = myUsername; Password=myPassword;");
+        public static string ConnectionString { get; set; }
+        private static OracleConnection connection;
+        private static object lockObject = new object();
 
-        private static void OracleConnect()
+        /// <summary>
+        /// 오라클 데이터베이스 연결
+        /// </summary>
+        /// <returns></returns>
+        private static OracleConnection GetConnection()
         {
+            connection = new OracleConnection(ConnectionString);
+
             try
             {
-                Conn.Open();
+                connection.Open();
             }
             catch (Exception)
             {
-                Conn.Close();
+                connection.Close();
             }
+
+            return connection;
         }
 
-        public static DataTable ExecuteDataSet(StringBuilder strSql, ParameterMember param = null)
+        /// <summary>
+        /// 쿼리문
+        /// </summary>
+        /// <param name="strSql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public static DataSet ExecuteDataSet(StringBuilder strSql, ParameterMember param = null)
         {
-            OracleConnect();
-            
-            using OracleDataAdapter adapter = new OracleDataAdapter()
-            {
-                SelectCommand = new OracleCommand(strSql.ToString(), Conn)
-            };
+            bool lockToken = false;
+            using DataSet ds = new DataSet();
 
-            if (param != null)
+            try
             {
-                adapter.SelectCommand.BindByName = true;
+                Monitor.Enter(lockObject, ref lockToken);
+                WeakReference weakConnection = new WeakReference(GetConnection());
+                
+                using OracleConnection connection = weakConnection.Target as OracleConnection;
+                using OracleCommand command = connection.CreateCommand();
+                using OracleDataAdapter adapter = new OracleDataAdapter(strSql.ToString(), connection);
 
-                foreach (var item in param)
+                command.CommandText = strSql.ToString();
+
+                if (param != null)
                 {
-                    adapter.SelectCommand.Parameters.Add(item.ParameterName, item.DbType, item.Value, ParameterDirection.Input);
+                    adapter.SelectCommand = command;
+                    BindParameter(strSql, command, param);
+                }
+
+                adapter.Fill(ds);
+
+                connection.Close();
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                if (lockToken)
+                {
+                    Monitor.Exit(lockObject);
                 }
             }
 
-            Conn.Close();
-
-            return adapter.SelectCommand.ExecuteReaderAsync().Result.GetSchemaTable();
+            return ds;
         }
 
-        public static void ExcuteNonQuery(StringBuilder strSql)
+        /// <summary>
+        /// Insert, Update, Delete
+        /// </summary>
+        /// <param name="strSql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public static int ExcuteNonQuery(StringBuilder strSql, ParameterMember param = null)
         {
+            int result = 0;
+            bool lockToken = false;
 
+            try
+            {
+                Monitor.Enter(lockObject, ref lockToken);
+                WeakReference weakConnection = new WeakReference(GetConnection());
+
+                using OracleConnection connection = weakConnection.Target as OracleConnection;
+                using OracleCommand command = connection.CreateCommand();
+
+                command.CommandText = strSql.ToString();
+
+                if (param != null)
+                {
+                    BindParameter(strSql, command, param);
+                }
+
+                result = command.ExecuteNonQuery();
+
+                connection.Close();
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                if (lockToken)
+                {
+                    Monitor.Exit(lockObject);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 오라클 파라미터 바인딩 메소드
+        /// </summary>
+        /// <param name="strSql"></param>
+        /// <param name="command"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        private static void BindParameter(StringBuilder strSql, OracleCommand command, ParameterMember param = null)
+        {
+            command.BindByName = true;
+
+            foreach (var item in param)
+            {
+                using OracleParameter parameter = command.CreateParameter();
+                parameter.ParameterName = item.ParameterName;
+                parameter.OracleDbType = item.DbType;
+                parameter.Value = item.Value;
+
+                command.Parameters.Add(parameter);
+            }
         }
     }
 }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StudyWebApplication.DbContext;
 using StudyWebApplication.Models;
-using StudyWebApplication.ViewModel;
+using System.Data;
 
 namespace StudyWebApplication.Controllers
 {
@@ -28,15 +24,30 @@ namespace StudyWebApplication.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(DtoUser model)
+        public IActionResult Login(User model)
         {
             if (ModelState.IsValid)
             {
-                DataTable dt = Data.SelectUser(model.UserId, model.UserPassword);
+                DataSet dt = UserData.SelectUser(model);
+
+                if (dt.Tables[0].Rows.Count > 0)
+                {
+                    HttpContext.Session.SetString("USER_LOGIN_KEY", dt.Tables[0].Select()[0]["USERID"].ToString());
+
+                    return RedirectToAction("Index", "Home");
+                }
+
+                ModelState.AddModelError(string.Empty, "사용자 아이디 또는 비밀번호가 올바르지 않습니다.");
             }
             return View(model);
         }
 
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Remove("USER_LOGIN_KEY");
+
+            return RedirectToAction("Index", "Home");
+        }
         /// <summary>
         /// 회원가입
         /// </summary>
@@ -46,12 +57,16 @@ namespace StudyWebApplication.Controllers
         {
             return View();
         }
+
         [HttpPost]
         public IActionResult Register(User model)
         {
             if (ModelState.IsValid)
             {
-                
+                if (UserData.InsertUser(model.UserId, model.UserPassword) > 0)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
             }
             return View(model);
         }

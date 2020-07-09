@@ -1,0 +1,31 @@
+﻿@model StudyWebApplication.ViewModels.NoteIndexView
+
+<form method="get" asp-controller="Note", asp-action="Index">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>생성일자</th>
+                <th>제목</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Notes)
+            {
+                <tr>
+                    <td>@item["NO"].ToString()</td>
+                    <td>@item["CREATE_DATE"].ToString()</td>
+                    <td>@item["TITLE"].ToString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div style="text-align: center">
+        <a style="float:right" class="btn btn-warning" asp-controller="Note" asp-action="Create">게시물 작성</a>
+        @for (int i = 0; i < (Model.NoteCount / 5) + 1; i++)
+        {
+            <a class="nav-item" asp-area="" asp-controller="Note" asp-action="Index" asp-route-Start="@((i * 5) + 1)" asp-route-End="@((i * 5) + 5)">@(i + 1)</a>
+        }
+    </div>
+</form>
+
