@@ -10,7 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Oracle.ManagedDataAccess.Client;
 using OracleInternal.SqlAndPlsqlParser.LocalParsing;
 
-namespace StudyWebApplication.DbContext
+namespace StudyWebApplication.DbHelper
 {
     public class OracleDataContext
     {
@@ -39,34 +39,31 @@ namespace StudyWebApplication.DbContext
         }
 
         /// <summary>
-        /// 쿼리문
+        /// 결과값의 첫 행의 값을 가져오는 메소드
         /// </summary>
         /// <param name="strSql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static DataSet ExecuteDataSet(StringBuilder strSql, ParameterMember param = null)
+        public static int ExecuteScalar(StringBuilder strSql, ParameterMember param = null)
         {
             bool lockToken = false;
-            using DataSet ds = new DataSet();
+            int count = 0;
 
             try
             {
                 Monitor.Enter(lockObject, ref lockToken);
-                WeakReference weakConnection = new WeakReference(GetConnection());
-                
-                using OracleConnection connection = weakConnection.Target as OracleConnection;
+
+                using OracleConnection connection = GetConnection();
                 using OracleCommand command = connection.CreateCommand();
-                using OracleDataAdapter adapter = new OracleDataAdapter(strSql.ToString(), connection);
 
                 command.CommandText = strSql.ToString();
 
                 if (param != null)
                 {
-                    adapter.SelectCommand = command;
-                    BindParameter(strSql, command, param);
+                    BindParameter(command, param);
                 }
 
-                adapter.Fill(ds);
+                count = Convert.ToInt32(command.ExecuteScalar());
 
                 connection.Close();
             }
@@ -81,7 +78,51 @@ namespace StudyWebApplication.DbContext
                 }
             }
 
-            return ds;
+            return count;
+        }
+
+        /// <summary>
+        /// 쿼리문
+        /// </summary>
+        /// <param name="strSql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public static DataTable ExecuteDataTable(StringBuilder strSql, ParameterMember param = null)
+        {
+            bool lockToken = false;
+            using DataTable dt = new DataTable();
+
+            try
+            {
+                Monitor.Enter(lockObject, ref lockToken);
+
+                using OracleConnection connection = GetConnection();
+                using OracleCommand command = connection.CreateCommand();
+                using OracleDataAdapter adapter = new OracleDataAdapter(command);
+
+                command.CommandText = strSql.ToString();
+
+                if (param != null)
+                {
+                    BindParameter(command, param);
+                }
+
+                adapter.Fill(dt);
+
+                connection.Close();
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                if (lockToken)
+                {
+                    Monitor.Exit(lockObject);
+                }
+            }
+
+            return dt;
         }
 
         /// <summary>
@@ -107,7 +148,7 @@ namespace StudyWebApplication.DbContext
 
                 if (param != null)
                 {
-                    BindParameter(strSql, command, param);
+                    BindParameter(command, param);
                 }
 
                 result = command.ExecuteNonQuery();
@@ -135,7 +176,7 @@ namespace StudyWebApplication.DbContext
         /// <param name="command"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        private static void BindParameter(StringBuilder strSql, OracleCommand command, ParameterMember param = null)
+        private static void BindParameter(OracleCommand command, ParameterMember param = null)
         {
             command.BindByName = true;
 

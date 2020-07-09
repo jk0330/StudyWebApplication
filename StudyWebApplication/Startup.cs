@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using StudyWebApplication.DbContext;
+using StudyWebApplication.DbHelper;
 
 namespace StudyWebApplication
 {
@@ -27,9 +22,7 @@ namespace StudyWebApplication
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddMvc();
             services.AddRazorPages().AddRazorRuntimeCompilation();
-
             //서비스에 세션 등록
             services.AddSession();
             
@@ -54,7 +47,6 @@ namespace StudyWebApplication
             //이 솔루션에서 사용
             app.UseSession();
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

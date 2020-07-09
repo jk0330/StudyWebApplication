@@ -4,32 +4,41 @@ using StudyWebApplication.ViewModels;
 using System.Data;
 using System.Text;
 
-namespace StudyWebApplication.DbContext
+namespace StudyWebApplication.DbHelper
 {
     public class NoteData
     {
-        public static DataSet SelectNote(NoteIndexView model)
+        public static int SelectNoteCount()
         {
             StringBuilder strSql = new StringBuilder();
+
+            strSql.Append(@" SELECT count(*) ");
+            strSql.Append(@" FROM TB_NOTES   ");
+
+            return OracleDataContext.ExecuteScalar(strSql);
+        }
+
+        public static DataTable SelectNote(NoteIndexView model)
+        {
+            StringBuilder strSql = new StringBuilder();
+            ParameterMember param = new ParameterMember();
+
+            strSql.Append(@" SELECT*                        ");
+            strSql.Append(@" FROM(                          ");
+            strSql.Append(@"      SELECT ROWNUM AS NUM, A.* ");
+            strSql.Append(@"      FROM(                     ");
+            strSql.Append(@"            SELECT *            ");
+            strSql.Append(@"            FROM TB_NOTES       ");
+            strSql.Append(@"            ORDER BY NO DESC    ");
+            strSql.Append(@"           ) A                  ");
+            strSql.Append(@"      WHERE ROWNUM <= :pEnd     ");
+            strSql.Append(@"      )                         ");
+            strSql.Append(@" WHERE NUM >= :pStart           ");
             
-            
-            strSql.Append(@" SELECT NO, TO_CHAR(CREATE_DATE, 'yyyy-mm-dd HH24:mi:ss') AS CREATE_DATE, TITLE, CONTENTS ");
-            strSql.Append(@" FROM TB_NOTES                                                                            ");
+            param.Add(OracleDbType.Int32, @"pStart", model.Start);
+            param.Add(OracleDbType.Int32, @"pEnd", model.End);
 
-            if (model.Start > 0 && model.End > 0)
-            {
-                ParameterMember param = new ParameterMember();
-
-                param.Add(OracleDbType.Int32, @"pStart", model.Start);
-                param.Add(OracleDbType.Int32, @"pEnd", model.End);
-
-                strSql.Append("WHERE ROWNUM >= :pStart");
-                strSql.Append("AND ROWNUM <= :pEnd");
-
-                return OracleDataContext.ExecuteDataSet(strSql, param);
-            }
-
-            return OracleDataContext.ExecuteDataSet(strSql);
+            return OracleDataContext.ExecuteDataTable(strSql, param);
         }
 
         public static int InsertNote(NoteIndexCreate model)

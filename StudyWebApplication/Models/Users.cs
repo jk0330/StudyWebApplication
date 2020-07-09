@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StudyWebApplication.Models
 {
-    public class User
+    public class Users
     {
         [Key]
         [Required(ErrorMessage ="사용자 ID을 입력하세요.")]

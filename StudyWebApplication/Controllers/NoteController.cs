@@ -1,8 +1,9 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using StudyWebApplication.DbContext;
+using StudyWebApplication.DbHelper;
 using StudyWebApplication.ViewModels;
 
 namespace StudyWebApplication.Controllers
@@ -17,19 +18,43 @@ namespace StudyWebApplication.Controllers
         [HttpGet]
         public ActionResult Index(NoteIndexView model)
         {
-            var notes = NoteData.SelectNote(model).Tables[0];//.Tables[0].Select().OrderByDescending(no => no["No"]);
+            if (model.Start == 0)
+            {
+                model.Start = 1;
+                model.End = 5;
+                model.NoteCount = 5;
+            }
+
+            int count = NoteData.SelectNoteCount();
+
+            if (model.Start < 1)
+            {
+                model.Start = 1;
+            }
+            else if (model.End > count)
+            {
+                model.End = count;
+            }
+
+            if (count < 5)
+            {
+                count = 5;
+            }
+
+            var notes = NoteData.SelectNote(model).Select();
 
             NoteIndexView viewModel = new NoteIndexView();
-            if (notes.Rows.Count < 1)
+
+            if (notes.Length < 1)
             {
                 viewModel.Notes = new System.Collections.Generic.List<DataRow>();
-                viewModel.NoteCount = 0;
+                viewModel.NoteCount = count;
 
                 return View(viewModel);
             }
 
-            viewModel.Notes = notes.Select().OrderByDescending(no => no["No"]).ToList();
-            viewModel.NoteCount = notes.Select().Length;
+            viewModel.Notes = notes.ToList();
+            viewModel.NoteCount = count;
 
             return View(viewModel);
         }

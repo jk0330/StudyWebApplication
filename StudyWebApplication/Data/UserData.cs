@@ -5,7 +5,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StudyWebApplication.DbContext
+namespace StudyWebApplication.DbHelper
 {
     public class UserData
     {
@@ -23,7 +23,7 @@ namespace StudyWebApplication.DbContext
             return OracleDataContext.ExcuteNonQuery(strSql, param);
         }
 
-        public static DataSet SelectUser(User model)
+        public static DataTable SelectUser(Users model)
         {
             StringBuilder strSql = new StringBuilder();
             ParameterMember param = new ParameterMember();
@@ -36,7 +36,7 @@ namespace StudyWebApplication.DbContext
             strSql.Append(@" WHERE USERID = :UserId           ");
             strSql.Append(@" AND USERPASSWORD = :UserPassword ");
 
-            return OracleDataContext.ExecuteDataSet(strSql, param);
+            return OracleDataContext.ExecuteDataTable(strSql, param);
         }
     }
 }

@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using StudyWebApplication.DbContext;
+using StudyWebApplication.DbHelper;
 using StudyWebApplication.Models;
 using System.Data;
+using System.Linq;
 
 namespace StudyWebApplication.Controllers
 {
@@ -24,15 +25,15 @@ namespace StudyWebApplication.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(User model)
+        public IActionResult Login(Users model)
         {
             if (ModelState.IsValid)
             {
-                DataSet dt = UserData.SelectUser(model);
+                DataTable dt = UserData.SelectUser(model);
 
-                if (dt.Tables[0].Rows.Count > 0)
+                if (dt.Rows.Count > 0)
                 {
-                    HttpContext.Session.SetString("USER_LOGIN_KEY", dt.Tables[0].Select()[0]["USERID"].ToString());
+                    HttpContext.Session.SetString("USER_LOGIN_KEY", dt.Select()[0]["USERID"].ToString());
 
                     return RedirectToAction("Index", "Home");
                 }
@@ -59,7 +60,7 @@ namespace StudyWebApplication.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(User model)
+        public IActionResult Register(Users model)
         {
             if (ModelState.IsValid)
             {

@@ -6,7 +6,7 @@ using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace StudyWebApplication.DbContext
+namespace StudyWebApplication.DbHelper
 {
     public class Parameter
     {

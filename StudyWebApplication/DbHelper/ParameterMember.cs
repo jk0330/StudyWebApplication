@@ -1,7 +1,7 @@
 ﻿using Oracle.ManagedDataAccess.Client;
 using System.Collections.Generic;
 
-namespace StudyWebApplication.DbContext
+namespace StudyWebApplication.DbHelper
 {
     public class ParameterMember : List<Parameter>
     {

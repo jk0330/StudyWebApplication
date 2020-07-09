@@ -22,9 +22,16 @@
     </table>
     <div style="text-align: center">
         <a style="float:right" class="btn btn-warning" asp-controller="Note" asp-action="Create">게시물 작성</a>
-        @for (int i = 0; i < (Model.NoteCount / 5) + 1; i++)
+        @for (int i = 0; i <= (Model.NoteCount / 5); i++)
         {
-            <a class="nav-item" asp-area="" asp-controller="Note" asp-action="Index" asp-route-Start="@((i * 5) + 1)" asp-route-End="@((i * 5) + 5)">@(i + 1)</a>
+            int end = ((i * 5) + 5);
+
+            if (Model.NoteCount < end)
+            {
+                end = Model.NoteCount;
+            }
+
+            <a class="nav-item" asp-area="" asp-controller="Note" asp-action="Index" asp-route-Start="@((i * 5) + 1)" asp-route-End="@end">@(i + 1)</a>
         }
     </div>
 </form>
