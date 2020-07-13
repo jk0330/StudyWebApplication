@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Oracle.ManagedDataAccess.Client;
-using OracleInternal.SqlAndPlsqlParser.LocalParsing;
 
 namespace StudyWebApplication.DbHelper
 {
@@ -16,7 +10,7 @@ namespace StudyWebApplication.DbHelper
     {
         public static string ConnectionString { get; set; }
         private static OracleConnection connection;
-        private static object lockObject = new object();
+        private static readonly object lockObject = new object();
 
         /// <summary>
         /// 오라클 데이터베이스 연결
@@ -139,9 +133,8 @@ namespace StudyWebApplication.DbHelper
             try
             {
                 Monitor.Enter(lockObject, ref lockToken);
-                WeakReference weakConnection = new WeakReference(GetConnection());
 
-                using OracleConnection connection = weakConnection.Target as OracleConnection;
+                using OracleConnection connection = GetConnection();
                 using OracleCommand command = connection.CreateCommand();
 
                 command.CommandText = strSql.ToString();
