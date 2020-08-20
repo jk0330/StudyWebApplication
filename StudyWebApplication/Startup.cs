@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using StudyWebApplication.Data;
 using StudyWebApplication.DbHelper;
 
 namespace StudyWebApplication
@@ -25,7 +27,7 @@ namespace StudyWebApplication
             services.AddRazorPages().AddRazorRuntimeCompilation();
             //서비스에 세션 등록
             services.AddSession();
-            
+            //services.AddEntityFrameworkOracle();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -2,9 +2,38 @@
     ViewData["Title"] = "Home Page";
 }
 
+    <script>
+    $(document).ready(function ()
+    {
+        $("#button1").click(function ()
+        {
+            $.ajax({
+                url: "@Url.Action("Test", "Note")",
+                //url: "/Note/Test",
+                type: "POST",
+                success: function(result)
+                {
+                    var str = new String(result).split(',');
+                    var result = '';
+
+                    for (var i = 0; i < str.length; i++)
+                    {
+                        result += `<h1>text${i} : ${str[i]} </h1>`;
+                    }
+
+                    $("#result1").html(result);
+                }
+            })
+        });
+    });
+    </script>
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 
     <h1>테스트</h1>
+    <input type="button" value="버튼" id="button1" class="btn btn-primary" />
+    <div id="result1">
+
+    </div>
 </div>

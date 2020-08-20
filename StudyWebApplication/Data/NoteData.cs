@@ -23,7 +23,7 @@ namespace StudyWebApplication.DbHelper
             StringBuilder strSql = new StringBuilder();
             ParameterMember param = new ParameterMember();
 
-            strSql.Append(@" SELECT*                        ");
+            strSql.Append(@" SELECT *                       ");
             strSql.Append(@" FROM(                          ");
             strSql.Append(@"      SELECT ROWNUM AS NUM, A.* ");
             strSql.Append(@"      FROM(                     ");
@@ -35,8 +35,8 @@ namespace StudyWebApplication.DbHelper
             strSql.Append(@"      )                         ");
             strSql.Append(@" WHERE NUM >= :pStart           ");
             
-            param.Add(OracleDbType.Int32, @"pStart", model.Start);
-            param.Add(OracleDbType.Int32, @"pEnd", model.End);
+            param.Add(OracleDbType.Int32, @"pStart", ((model.Page * 10) - 9));
+            param.Add(OracleDbType.Int32, @"pEnd", model.Page * 10);
 
             return OracleDataContext.ExecuteDataTable(strSql, param);
         }
@@ -48,11 +48,26 @@ namespace StudyWebApplication.DbHelper
 
             param.Add(OracleDbType.Varchar2, @"pTitle", model.Title);
             param.Add(OracleDbType.Varchar2, @"pContents", model.Contents);
+            param.Add(OracleDbType.Varchar2, @"pUserName", model.UserName);
 
-            strSql.Append(@" INSERT INTO TB_NOTES(NO, TITLE, CONTENTS)   ");
-            strSql.Append(@" VALUES(NO_SEQ.NEXTVAL, :pTitle, :pContents) ");
+            strSql.Append(@" INSERT INTO TB_NOTES(NO, TITLE, CONTENTS, USERNAME)        ");
+            strSql.Append(@" VALUES(NOTES_SEQ.NEXTVAL, :pTitle, :pContents, :pUserName) ");
 
             return OracleDataContext.ExcuteNonQuery(strSql, param);
+        }
+
+        public static DataTable SelectDetail(int no)
+        {
+            StringBuilder strSql = new StringBuilder();
+            ParameterMember param = new ParameterMember();
+
+            strSql.Append(@" SELECT *        ");
+            strSql.Append(@" FROM TB_NOTES   ");
+            strSql.Append(@" WHERE NO = :pNo ");
+
+            param.Add(OracleDbType.Int32, @"pNo", no);
+
+            return OracleDataContext.ExecuteDataTable(strSql, param);
         }
     }
 }

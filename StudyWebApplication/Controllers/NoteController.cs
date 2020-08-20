@@ -1,8 +1,8 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using StudyWebApplication.Data;
 using StudyWebApplication.DbHelper;
 using StudyWebApplication.ViewModels;
 
@@ -18,51 +18,37 @@ namespace StudyWebApplication.Controllers
         [HttpGet]
         public ActionResult Index(NoteIndexView model)
         {
-            if (model.Start == 0)
+            if (model.Page == 0)
             {
-                model.Start = 1;
-                model.End = 5;
-                model.NoteCount = 5;
+                model.Page = 1;
             }
 
             int count = NoteData.SelectNoteCount();
 
-            if (model.Start < 1)
-            {
-                model.Start = 1;
-            }
-            else if (model.End > count)
-            {
-                model.End = count;
-            }
-
-            if (count < 5)
-            {
-                count = 5;
-            }
+            model.NoteCount = (count % 10 == 0) ? (count / 10) : ((count / 10) + 1);
 
             var notes = NoteData.SelectNote(model).Select();
 
-            NoteIndexView viewModel = new NoteIndexView();
-
             if (notes.Length < 1)
             {
-                viewModel.Notes = new System.Collections.Generic.List<DataRow>();
-                viewModel.NoteCount = count;
+                model.Notes = new System.Collections.Generic.List<DataRow>();
 
-                return View(viewModel);
+                return View(model);
             }
 
-            viewModel.Notes = notes.ToList();
-            viewModel.NoteCount = count;
+            model.Notes = notes.ToList();
 
-            return View(viewModel);
+            return View(model);
         }
 
-        // GET: NoteController/Details/5
-        public ActionResult Details(int id)
+        public IActionResult Test()
         {
-            return View();
+            return new JsonResult(new string[] { "c", "j", "k" });
+        }
+        // GET: NoteController/Details/5
+        public ActionResult Detail(int no)
+        {
+            return View(NoteData.SelectDetail(no).Select().First());
         }
 
         /// <summary>
@@ -83,6 +69,7 @@ namespace StudyWebApplication.Controllers
         [HttpPost]
         public ActionResult Create(NoteIndexCreate model)
         {
+            model.UserName = HttpContext.Session.GetString("USER_LOGIN_KEY");
 
             if (ModelState.IsValid)
             {

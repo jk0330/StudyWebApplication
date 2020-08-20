@@ -1,12 +1,18 @@
-﻿@model StudyWebApplication.ViewModels.UserViewModel
+﻿@model StudyWebApplication.Models.Users
 
 <h1>회원가입</h1>
 
 <form style="display: flex; flex-direction:column;" method="post" asp-controller="Account" asp-action="Register">
     <div class="form-group">
         <label>사용자 ID</label>
-        <input type="text" class="form-control" asp-for="UserId" placeholder="사용자 ID를 입력하세요" autofocus/>
+        <input type="text" class="form-control" asp-for="UserId" placeholder="사용자 ID를 입력하세요" autofocus />
         <span class="text-danger" asp-validation-for="UserId"></span>
+    </div>
+
+    <div class="form-group">
+        <label>사용자명</label>
+        <input type="text" class="form-control" asp-for="UserName" placeholder="사용자 이름을 입력하세요" />
+        <span class="text-danger" asp-validation-for="UserName"></span>
     </div>
 
     <div class="form-group">

@@ -8,10 +8,10 @@ namespace StudyWebApplication.ViewModels
 {
     public class NoteIndexCreate
     {
-        [Required]
         public string Title { get; set; }
 
-        [Required]
         public string Contents { get; set; }
+
+        public string UserName { get; set; }
     }
 }

@@ -9,8 +9,6 @@ namespace StudyWebApplication.ViewModels
 
         public int NoteCount { get; set; }
 
-        public int Start { get; set; }
-
-        public int End { get; set; }
+        public int Page { get; set; }
     }
 }

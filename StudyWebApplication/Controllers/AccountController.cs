@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using StudyWebApplication.Data;
 using StudyWebApplication.DbHelper;
 using StudyWebApplication.Models;
+using StudyWebApplication.ViewModels;
 using System.Data;
 using System.Linq;
 
@@ -25,7 +27,7 @@ namespace StudyWebApplication.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(Users model)
+        public IActionResult Login(UserViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -33,7 +35,7 @@ namespace StudyWebApplication.Controllers
 
                 if (dt.Rows.Count > 0)
                 {
-                    HttpContext.Session.SetString("USER_LOGIN_KEY", dt.Select()[0]["USERID"].ToString());
+                    HttpContext.Session.SetString("USER_LOGIN_KEY", dt.Select()[0]["USERNAME"].ToString());
 
                     return RedirectToAction("Index", "Home");
                 }
@@ -49,6 +51,7 @@ namespace StudyWebApplication.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
         /// <summary>
         /// 회원가입
         /// </summary>
@@ -64,7 +67,13 @@ namespace StudyWebApplication.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (UserData.InsertUser(model.UserId, model.UserPassword) > 0)
+                using var context = new HomeContext();
+
+                context.users.Add(model); 
+
+                var result = context.SaveChanges();
+
+                if (UserData.InsertUser(model) > 0)
                 {
                     return RedirectToAction("Login", "Account");
                 }

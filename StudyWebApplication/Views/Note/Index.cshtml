@@ -1,12 +1,53 @@
-﻿@model StudyWebApplication.ViewModels.NoteIndexView
+﻿@using Microsoft.AspNetCore.Http
 
-<form method="get" asp-controller="Note", asp-action="Index">
+<style>
+    a:link {
+        text-decoration: none;
+        color: #646464;
+    }
+
+    a:visited {
+        text-decoration: none;
+        color: #646464;
+    }
+
+    a:active {
+        text-decoration: none;
+        color: #646464;
+    }
+
+    a:hover {
+        text-decoration: none;
+        color: #646464;
+    }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        $('#btnCreate').click(function ()
+        {
+            var result = @Html.Raw(Json.Serialize(Context.Session.GetString("USER_LOGIN_KEY")));
+
+            if (result === null)
+            {
+                alert("로그인을 해주세요.");
+
+                location.href = "@Url.Action("Login", "Account")";
+            }
+        });
+    });
+</script>
+
+<form method="get">
+    @*//asp-controller="Note" , asp-action="Index">*@
     <table class="table table-bordered">
         <thead>
             <tr>
                 <th>번호</th>
-                <th>생성일자</th>
                 <th>제목</th>
+                <th>작성자</th>
+                <th>생성일자</th>
             </tr>
         </thead>
         <tbody>
@@ -14,25 +55,45 @@
             {
                 <tr>
                     <td>@item["NO"].ToString()</td>
+                    <td><a asp-controller="Note" asp-action="Detail" asp-route-No="@item["NO"].ToString()">@(item["TITLE"].ToString())</a></td>
+                    <td>@item["USERNAME"].ToString()</td>
                     <td>@item["CREATE_DATE"].ToString()</td>
-                    <td>@item["TITLE"].ToString()</td>
                 </tr>
             }
         </tbody>
     </table>
     <div style="text-align: center">
-        <a style="float:right" class="btn btn-warning" asp-controller="Note" asp-action="Create">게시물 작성</a>
-        @for (int i = 0; i <= (Model.NoteCount / 5); i++)
-        {
-            int end = ((i * 5) + 5);
-
-            if (Model.NoteCount < end)
+        @{
+            // 총 페이지가 10개 미만이면 이전페이지 버튼 활성화
+            if (Model.Page > 10)
             {
-                end = Model.NoteCount;
+                <a class="nav-item" asp-area="" asp-controller="Note" asp-action="Index" asp-route-Page="@(Model.Page < 10 ? (Model.Page / 10) + 1 : ((Model.Page / 10) * 10))">이전페이지</a>
             }
 
-            <a class="nav-item" asp-area="" asp-controller="Note" asp-action="Index" asp-route-Start="@((i * 5) + 1)" asp-route-End="@end">@(i + 1)</a>
+            // 페이지 시작 수 계산 14 -> 11, 9 -> 1
+            var start = (Model.Page < 10) ? (Model.Page / 10) + 1 : (Model.Page % 10 == 0) ? (((Model.Page / 10) * 10) - 9) : (((Model.Page / 10) * 10) + 1);
+
+            for (int i = start; i <= Model.NoteCount; i++)
+            {
+                <a class="nav-item" asp-area="" asp-controller="Note" asp-action="Index" asp-route-Page="@i">@i</a>
+
+                if (i >= (start + 9))
+                {
+                    break;
+                }
+            }
+
+            // 현재 보여주는 페이지 갯수 계산
+            var currentCount = (Model.Page < 10) ? ((Model.Page / 10) + 10) : (Model.Page % 10 == 0) ? ((Model.Page / 10) * 10) : (((Model.Page / 10) * 10) + 10);
+
+            // 총 페이지 갯수가 현재 페이지의 갯수보다 크면 다음페이지 버튼 활성화
+            if (Model.NoteCount > currentCount)
+            {
+                <a class="nav-item" asp-area="" asp-controller="Note" asp-action="Index" asp-route-Page="@(currentCount + 1)">다음페이지</a>
+            }
         }
     </div>
 </form>
-
+<div>
+    <a id="btnCreate" style="float:right" class="btn btn-warning">게시물 작성</a>
+</div>
