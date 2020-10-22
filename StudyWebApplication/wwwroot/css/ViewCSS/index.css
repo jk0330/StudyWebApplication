@@ -1,0 +1,24 @@
+﻿#list1 li {
+    list-style: none;
+    border-bottom: 1px solid #cfcfcf;
+    width: 200px;
+    padding: 10px;
+    font-size: 18px;
+    font-family: notokr;
+}
+
+/*왼쪽 li 리스트*/
+#divList{
+    position: absolute;
+    float: left;
+    width:200px;
+    height: 100%;
+    border-right: 1px solid black;
+}
+
+/*그 외의 공간*/
+#div1{
+    float: right;
+    width: 100%;
+    height: 100%;
+}

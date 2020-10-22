@@ -1,10 +1,9 @@
-﻿using System.Data;
-using System.Linq;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using StudyWebApplication.Data;
 using StudyWebApplication.DbHelper;
 using StudyWebApplication.ViewModels;
+using System.Data;
+using System.Linq;
 
 namespace StudyWebApplication.Controllers
 {
@@ -41,7 +40,7 @@ namespace StudyWebApplication.Controllers
             return View(model);
         }
 
-        public IActionResult Test()
+        public ActionResult Test()
         {
             return new JsonResult(new string[] { "c", "j", "k" });
         }

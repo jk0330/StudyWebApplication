@@ -3,10 +3,8 @@ using StudyWebApplication.Models;
 using StudyWebApplication.ViewModels;
 using System;
 using System.Data;
-using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace StudyWebApplication.DbHelper
 {
@@ -20,7 +18,7 @@ namespace StudyWebApplication.DbHelper
             {
                 Key = Encoding.Default.GetBytes(model.UserId)
             };
-            
+
             param.Add(OracleDbType.Varchar2, @"UserId", model.UserId);
             param.Add(OracleDbType.Varchar2, @"UserName", model.UserName);
             param.Add(OracleDbType.Varchar2, @"UserPassword", Convert.ToBase64String(hash.ComputeHash(hash.ComputeHash(Encoding.Default.GetBytes(model.UserPassword)))));

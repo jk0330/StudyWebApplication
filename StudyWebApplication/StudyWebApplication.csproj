@@ -2,7 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>4fc7a4e8-bd53-47db-8fda-de75f0cfebcf</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ViewModels\NewFolder\**" />
+    <Content Remove="ViewModels\NewFolder\**" />
+    <EmbeddedResource Remove="ViewModels\NewFolder\**" />
+    <None Remove="ViewModels\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\ViewJS\index.js" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.6" />
@@ -10,10 +22,6 @@
     <PackageReference Include="MySql.Data" Version="8.0.21" />
     <PackageReference Include="Oracle.EntityFrameworkCore" Version="2.19.80" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.80" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ViewModels\NewFolder\" />
   </ItemGroup>
 
 </Project>

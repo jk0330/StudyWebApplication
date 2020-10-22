@@ -5,7 +5,7 @@ namespace StudyWebApplication.DbHelper
 {
     public class ParameterMember : List<Parameter>
     {
-        public void Add(OracleDbType dbType, string parameterName , object value)
+        public void Add(OracleDbType dbType, string parameterName, object value)
         {
             this.Add(new Parameter(dbType, parameterName, value));
         }

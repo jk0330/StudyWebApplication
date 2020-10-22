@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Oracle.ManagedDataAccess.Client;
+using System;
 using System.Data;
 using System.Text;
 using System.Threading;
-using Oracle.ManagedDataAccess.Client;
 
 namespace StudyWebApplication.DbHelper
 {

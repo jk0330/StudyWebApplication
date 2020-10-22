@@ -5,7 +5,6 @@ using StudyWebApplication.DbHelper;
 using StudyWebApplication.Models;
 using StudyWebApplication.ViewModels;
 using System.Data;
-using System.Linq;
 
 namespace StudyWebApplication.Controllers
 {
@@ -69,7 +68,7 @@ namespace StudyWebApplication.Controllers
             {
                 using var context = new HomeContext();
 
-                context.users.Add(model); 
+                context.users.Add(model);
 
                 var result = context.SaveChanges();
 

@@ -1,5 +1,4 @@
 ﻿using Oracle.ManagedDataAccess.Client;
-using StudyWebApplication.Models;
 using StudyWebApplication.ViewModels;
 using System.Data;
 using System.Text;
@@ -34,7 +33,7 @@ namespace StudyWebApplication.DbHelper
             strSql.Append(@"      WHERE ROWNUM <= :pEnd     ");
             strSql.Append(@"      )                         ");
             strSql.Append(@" WHERE NUM >= :pStart           ");
-            
+
             param.Add(OracleDbType.Int32, @"pStart", ((model.Page * 10) - 9));
             param.Add(OracleDbType.Int32, @"pEnd", model.Page * 10);
 
